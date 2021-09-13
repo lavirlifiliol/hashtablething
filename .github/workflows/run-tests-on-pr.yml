@@ -1,0 +1,16 @@
+name: Run tests
+on: [workflow_dispatch, pull_request, push]
+
+jobs:
+    run_tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2 
+            - run: |
+                sudo apt-get update -y
+                sudo apt-get install -y gcc python3-pip valgrind
+                sudo python3 -m pip install scons
+              shell: bash
+            - run: scons test
+              shell: bash
+

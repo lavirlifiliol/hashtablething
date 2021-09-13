@@ -1,0 +1,23 @@
+env = Environment(
+    CPPFLAGS=['-Wall', '-Wextra', '-Wpedantic', '-Werror'],
+    CPPPATH=['.', '../include'],
+    VGFLAGS=['--quiet','--leak-check=full','--show-leak-kinds=all','--track-origins=yes','--error-exitcode=1'],
+)
+test_binary = env.Program(
+    'test',
+    env.Glob('*.c'),
+    CFLAGS=[ '-fsanitize=undefined', '-DSNOW_ENABLED', '-Og', '-g',],
+    LINKFLAGS=['-fsanitize=undefined'],
+    OBJPREFIX='test-'
+)
+
+prod_binary = env.Program(
+    env.Glob('*.c'),
+    CFLAGS=['-O2'],
+)
+
+env.Alias('test', test_binary)
+env.AddPostAction(test_binary, 'valgrind $VGFLAGS ./build/test')  
+env.AlwaysBuild(test_binary)
+env.Depends(prod_binary, test_binary)
+env.Command('../out/'+str(prod_binary[0]), prod_binary, 'cp $SOURCE $TARGET',)
