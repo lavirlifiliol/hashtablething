@@ -1,1 +1,2 @@
-SConscript('src/SConscript', variant_dir='build')
+a = SConscript('src/SConscript', variant_dir='build')
+print(a)
